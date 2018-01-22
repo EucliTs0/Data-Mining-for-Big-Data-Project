@@ -3,11 +3,7 @@
 #
 # MLDM M2
 #
-# Subject: Q2) Understand why the customers are not satisfied
-# Start with apriori to look for frequent itemsets of customer
-# information to complaint type.
-# Secondly, we will do text analysis for each of the complaint 
-# types and look for descriptive words for those complains
+# 
 #
 # Austin Schwinn, Joe Renner, 
 # Dimitris Tsolakidis, & Oussama Bouldjedri
@@ -22,7 +18,7 @@ library(plyr)
 library(readr)
 library(arules)
 library(rpart)
-setwd('D:/GD/MLDM/Big Data/Project/git_repo')
+#setwd('D:/GD/MLDM/Big Data/Project/git_repo')
 #############################################
 # Q 3.1)
 #############################################
@@ -39,7 +35,7 @@ setwd('D:/GD/MLDM/Big Data/Project/git_repo')
 survey_num <- 11
 
 #Load files
-dir <- 'D:/GD/MLDM/Big Data/Project/big_data_project_confidential/'
+dir <- 'C:/Users/Ts0/Documents/big_data_project_confidential/'
 
 B_Donnes_clients <- read_csv2(paste(dir,"BASE_Donnees_Clients.csv",sep = ''))
 B_Reclamations_clients <- read_csv2(paste(dir,"BASE_Reclamations_clients.csv",sep = ''))
@@ -186,17 +182,26 @@ colnames(apr_ready) <- c('itemList')
 
 
 #Save to csv
-csv_name <- paste(survey_name,'apriori_table.csv',sep='_')
-write.csv(apr_ready,csv_name,row.names = FALSE)
+csv_name <- paste(survey_name,'apriori_table_2.csv',sep='_')
+write.csv(apr_ready,'apriori_table_2.csv',row.names = FALSE)
 
-######################################
-# **** IMPORTANT *****
+######
+# **** IMPORTANT *****  **** IMPORTANT *****
 # Must open csv file and replace every , with ","
 # and then save before the next step
-######################################
+# For example use Notepad++, use find-replace command and replace (,) with (",")
+
+#BUT, for convenience we provide the 'apriori_table2.csv' file which is in an
+#appropriate format to load.
+
+#We tried to fix it by coding exlusively in R, but instead of replacing with (",")
+#it was replaced by ("",""). 
+#E.g.: #apr_ready <- data.frame(lapply(apr_ready, function(x) {gsub(',', '","', x)}))
+
+######
 
 #Load apr_ready df into transactions table
-apr_ready <- read.transactions(file=csv_name,
+apr_ready <- read.transactions(file='apriori_table2.csv',
                                rm.duplicates = TRUE, format='basket',
                                sep=',', cols = NULL)
 
@@ -214,7 +219,7 @@ write.csv(survey_rules,rules_name)
 # Q 3.2)
 #############################################
 #Load files
-dir <- 'D:/GD/MLDM/Big Data/Project/big_data_project_confidential/'
+dir <- 'C:/Users/Ts0/Documents/big_data_project_confidential/'
 
 B_Donnes_clients <- read_csv2(paste(dir,"BASE_Donnees_Clients.csv",sep = ''))
 
@@ -280,7 +285,7 @@ plot(income_reg)
 # Q 3.3)
 #############################################
 #Load files
-dir <- 'D:/GD/MLDM/Big Data/Project/big_data_project_confidential/'
+dir <- 'C:/Users/Ts0/Documents/big_data_project_confidential/'
 
 B_Donnes_clients <- read_csv2(paste(dir,"BASE_Donnees_Clients.csv",sep = ''))
 B_Avantages_clients <- read_csv2(paste(dir,"BASE_Avantages_clients.csv",sep = ''))
@@ -341,9 +346,9 @@ colnames(B_Avantages_clients) <- c('ID_GRC','advantage')
 tot_info <- merge(x=B_Avantages_clients, y=survey, by='ID_GRC', all=TRUE)
 tot_info$ID_GRC <- NULL
 
-#Runa decision tree to look from advantages to survey reults
+#Run a decision tree to look from advantages to survey reults
 adv_tree <- rpart(Survey_rank ~ .,
-                  method="class", data=tot_info)
+                  method="class", data=tot_info, control=rpart.control(minsplit=50, minbucket=1, cp=0.005))
 # display the results
 printcp(adv_tree) 
 # visualize cross-validation results
@@ -372,7 +377,7 @@ income_info <- income_info[complete.cases(income_info), ]
 
 #Runa decision tree to look from advantages to income
 adv_tree <- rpart(advantage ~ .,
-                  method="class", data=tot_info)
+                  method="class", data=tot_info, control=rpart.control(minsplit=2, minbucket=1, cp=0.005))
 # display the results
 printcp(adv_tree) 
 # visualize cross-validation results
