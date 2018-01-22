@@ -35,8 +35,6 @@ library(arules)
 ####
 
 #Load files
-#You have to change the path if you use it in your own machine.
-
 dir <- 'C:/Users/Ts0/Documents/big_data_project_confidential/'
 
 B_Donnes_clients <- read_csv2(paste(dir,"BASE_Donnees_Clients.csv", sep= ''))
@@ -177,13 +175,17 @@ apr_ready <- ddply(apr_ready,c('id'),
 #Remove id column
 apr_ready$id <- NULL
 colnames(apr_ready) <- c('itemList')
-d <- data.frame(lapply(apr_ready, function(x) {gsub(',', '","', x)}))
 
 #Save to csv
-write.csv2(d,'apriori_table.csv',row.names = FALSE)
+write.csv2(apr_ready,'apriori_table_t.csv',row.names = FALSE)
+
+#for (r in 1:nrow(apr_ready)) {
+ # apr_ready[r] <- data.frame(lapply(apr_ready[r], function(x) {gsub(",","\",\"", x)}))
+#}
+
 
 ######
-# **** IMPORTANT *****
+# **** IMPORTANT ***** **** IMPORTANT *****
 # Must open csv file and replace every , with ","
 # and then save before the next step
 # For example use Notepad++, use find-replace command and replace (,) with (",")
@@ -193,7 +195,7 @@ write.csv2(d,'apriori_table.csv',row.names = FALSE)
 
 #We tried to fix it by coding exlusively in R, but instead of replacing with (",")
 #it was replaced by ("",""). 
-#E.g.: #apr_ready <- data.frame(lapply(apr_ready, function(x) {gsub(',', '","', x)}))
+#E.g.: #apr_ready <- data.frame(lapply(apr_ready, function(x) {gsub(",","\",\"", x)}))
 
 ######
 
